@@ -1,0 +1,4 @@
+.env
+*.db
+*.py[cod]
+__pycache__/

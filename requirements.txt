@@ -1,0 +1,4 @@
+requests
+sqlalchemy
+twilio
+python-dotenv
