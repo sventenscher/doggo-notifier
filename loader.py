@@ -50,15 +50,14 @@ for page in PAGE_COUNT:
             size=dog['acf']["single_animal_size"],
             age_span=dog['acf']["single_animal_age_span"],
             last_seen_listed=datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
-            )
-            
-        if not DB_SESSION.query(exists().where(dog['id'] == record.id)):
+        )
+        
+        EXISTS = DB_SESSION.query(Doggos).filter_by(id=dog['id']).first()
+        
+        if not EXISTS:
             DB_SESSION.add(record)
-            try:
-                DB_SESSION.commit()
-                check_doggo(dog['id'])
-            except:
-                DB_SESSION.rollback()
-                x = DB_SESSION.query(Doggos).get(dog['id'])
-                x.last_seen_listed = datetime.datetime.now().strftime('%d.%m.%Y %H:%M')
-                DB_SESSION.commit()
+            DB_SESSION.commit()
+            check_doggo(dog['id'])
+        else:
+            EXISTS.last_seen_listed = datetime.datetime.now().strftime('%d.%m.%Y %H:%M')
+            DB_SESSION.commit()

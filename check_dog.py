@@ -4,22 +4,24 @@ and sends whatsapp notification in case of new dog'''
 import datetime
 import re
 import os
-from twilio.rest import Client
 from dotenv import load_dotenv
-
 from connection import DB_SESSION
 from models import Doggos
+import smtplib, ssl
 
 load_dotenv()
 
-ACCOUNT_SID = os.getenv('ACCOUNT_SID')
-AUTH_TOKEN = os.getenv('AUTH_TOKEN')
-MOBILE = os.getenv('MOBILE')
-
-CLIENT = Client(ACCOUNT_SID, AUTH_TOKEN)
+port = 465
+smtp_server = os.getenv('smtp_server')
+sender_email = os.getenv('sender_email')
+receiver_email = os.getenv('receiver_email')
+login = os.getenv('login')
+password = os.getenv('password') 
 
 YEARS = 3 * 365
 CUT_OF_AGE = datetime.date.today() - datetime.timedelta(days=YEARS)
+
+
 
 def check_doggo(dog_id):
     '''handling the age and size check giving the dog id and sending the message'''
@@ -36,8 +38,15 @@ def check_doggo(dog_id):
             pass
 
     if CUT_OF_AGE <= age and dog.size != 'klein' and dog.age_span != 'senior':
-        CLIENT.messages.create(
-            from_='whatsapp:+14155238886',
-            body=f'''Es gibt einen neuen Hund im Tierheim. Er heißt *{dog.name}* und ist ein *{dog.breed}*. Schau ihn dir hier an: {dog.link}''',
-            to=f'whatsapp:{MOBILE}'
-            )
+        
+        message = f"""\
+        Subject: Ein neuer Hund ist im Tierheim
+        
+        Er heißt {dog.name} und ist ein {dog.breed}.
+        Du kannst ihn dir hier anschauen {dog.link}.
+        """
+        
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+            server.login(login, password)
+            server.sendmail(sender_email, receiver_email, message)
