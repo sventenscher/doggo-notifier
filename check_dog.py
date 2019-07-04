@@ -38,7 +38,6 @@ def check_doggo(dog_id):
     if CUT_OF_AGE <= age and dog.size != 'klein' and dog.age_span != 'senior':
         CLIENT.messages.create(
             from_='whatsapp:+14155238886',
-            body=f'Es gibt einen neuen Hund im Tierheim. \
-             Er heißt {dog.name} und ist ein {dog.breed}',
+            body=f'''Es gibt einen neuen Hund im Tierheim. Er heißt *{dog.name}* und ist ein *{dog.breed}*. Schau ihn dir hier an: {dog.link}''',
             to=f'whatsapp:{MOBILE}'
             )

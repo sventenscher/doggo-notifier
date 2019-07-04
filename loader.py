@@ -37,6 +37,7 @@ for page in PAGE_COUNT:
 
         record = Doggos(
             id=dog["id"],
+            link=dog["link"],
             date_added=dog["date"],
             name=html.unescape(dog["title"]["rendered"]),
             listing_id=html.unescape(dog['acf']["single_animal_listing_ID"]),

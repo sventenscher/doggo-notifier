@@ -8,6 +8,7 @@ class Doggos(Base):
     __tablename__ = 'doggos'
 
     id = Column(String, primary_key=True)
+    link = Column(String)
     date_added = Column(String)
     name = Column(String)
     listing_id = Column(String)
