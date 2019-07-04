@@ -9,6 +9,8 @@ from connection import DB_SESSION, init_db
 from models import Doggos
 from check_dog import check_doggo
 
+from sqlalchemy import exists
+
 init_db()
 
 PAYLOAD = {
@@ -49,13 +51,14 @@ for page in PAGE_COUNT:
             age_span=dog['acf']["single_animal_age_span"],
             last_seen_listed=datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
             )
-
-        DB_SESSION.add(record)
-        try:
-            DB_SESSION.commit()
-            check_doggo(dog['id'])
-        except:
-            DB_SESSION.rollback()
-            x = DB_SESSION.query(Doggos).get(dog['id'])
-            x.last_seen_listed = datetime.datetime.now().strftime('%d.%m.%Y %H:%M')
-            DB_SESSION.commit()
+            
+        if not DB_SESSION.query(exists().where(dog['id'] == record.id)):
+            DB_SESSION.add(record)
+            try:
+                DB_SESSION.commit()
+                check_doggo(dog['id'])
+            except:
+                DB_SESSION.rollback()
+                x = DB_SESSION.query(Doggos).get(dog['id'])
+                x.last_seen_listed = datetime.datetime.now().strftime('%d.%m.%Y %H:%M')
+                DB_SESSION.commit()
