@@ -34,14 +34,14 @@ Schau ihn dir hier an: {dog.link}'''
     
     try:
         age = datetime.datetime.strptime(dog.birthday.strip(), '%d.%m.%Y').date()
-    except:
-        age = re.search('[0-9]/[0-9]{4}', dog.birthday.strip())
+    except ValueError:
+        age = re.search('[0-9]{2}/[0-9]{4}', dog.birthday.strip())
         age = datetime.datetime.strptime(age.group(0), '%m/%Y').date()
     else:
         try:
             age = re.search('[0-9]{4}', dog.birthday.strip())
             age = datetime.datetime.strptime(age.group(0), '%Y').date()
-        except:
+        except ValueError:
             pass
 
     if CUT_OF_AGE <= age and dog.size != 'klein' and dog.age_span != 'senior':
