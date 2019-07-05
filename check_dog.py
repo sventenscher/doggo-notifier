@@ -7,29 +7,36 @@ import os
 from dotenv import load_dotenv
 from connection import DB_SESSION
 from models import Doggos
-import smtplib, ssl
+import requests
 
 load_dotenv()
 
-port = 465
-smtp_server = os.getenv('smtp_server')
-sender_email = os.getenv('sender_email')
-receiver_email = os.getenv('receiver_email')
-login = os.getenv('login')
-password = os.getenv('password') 
+BOT_TOKEN = os.getenv('bot_token')
+BOT_CHAT_ID = os.getenv('bot_chat_ID')
+
 
 YEARS = 3 * 365
 CUT_OF_AGE = datetime.date.today() - datetime.timedelta(days=YEARS)
 
-
+def bot_sendtext(bot_message):
+    send_text = f'''https://api.telegram.org/bot{BOT_TOKEN}/SendMessage?chat_id={BOT_CHAT_ID}&parse_mode=Markdown&text={bot_message}'''
+    requests.get(send_text)
 
 def check_doggo(dog_id):
     '''handling the age and size check giving the dog id and sending the message'''
+    
     dog = DB_SESSION.query(Doggos).get(dog_id)
+    
+    message = f'''Es gibt einen neuen Hund im Tierheim. \n
+Sein Name ist *{dog.name}* und er ist ein *{dog.breed}*. \n
+Schau ihn dir hier an: {dog.link}'''
+        
+    
     try:
         age = datetime.datetime.strptime(dog.birthday.strip(), '%d.%m.%Y').date()
     except:
-        age = datetime.datetime.strptime(dog.birthday.strip(), '%m/%Y').date()
+        age = re.search('[0-9]/[0-9]{4}', dog.birthday.strip())
+        age = datetime.datetime.strptime(age.group(0), '%m/%Y').date()
     else:
         try:
             age = re.search('[0-9]{4}', dog.birthday.strip())
@@ -38,15 +45,4 @@ def check_doggo(dog_id):
             pass
 
     if CUT_OF_AGE <= age and dog.size != 'klein' and dog.age_span != 'senior':
-        
-        message = f"""\
-        Subject: Ein neuer Hund ist im Tierheim
-        
-        Er heißt {dog.name} und ist ein {dog.breed}.
-        Du kannst ihn dir hier anschauen {dog.link}.
-        """
-        
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-            server.login(login, password)
-            server.sendmail(sender_email, receiver_email, message)
+        bot_sendtext(message)
