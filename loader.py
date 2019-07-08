@@ -49,6 +49,7 @@ for page in PAGE_COUNT:
             sex=dog['acf']["single_animal_sex"],
             size=dog['acf']["single_animal_size"],
             age_span=dog['acf']["single_animal_age_span"],
+            featured_image_link=dog['featured_image_src_url'],
             last_seen_listed=datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
         )
         
@@ -57,7 +58,7 @@ for page in PAGE_COUNT:
         if not EXISTS:
             DB_SESSION.add(record)
             DB_SESSION.commit()
-            check_doggo(dog['id'])
+            #check_doggo(dog['id'])
         else:
             EXISTS.last_seen_listed = datetime.datetime.now().strftime('%d.%m.%Y %H:%M')
             DB_SESSION.commit()

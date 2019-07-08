@@ -18,6 +18,7 @@ class Doggos(Base):
     sex = Column(String)
     size = Column(String)
     age_span = Column(String)
+    featured_image_link = Column(String)
     last_seen_listed = Column(String)
     
     def __repr__(self):
