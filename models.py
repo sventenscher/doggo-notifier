@@ -1,7 +1,8 @@
 """ORM models for dog information database table"""
 from sqlalchemy import Column, String
-from connection import Base
+from sqlalchemy.ext.declarative import declarative_base
 
+Base = declarative_base()
 
 class Doggos(Base):
     """table for dog info"""
@@ -19,6 +20,7 @@ class Doggos(Base):
     size = Column(String)
     age_span = Column(String)
     featured_image_link = Column(String)
+    first_seen_listed = Column(String)
     last_seen_listed = Column(String)
     
     def __repr__(self):
