@@ -28,18 +28,28 @@ Schau ihn dir hier an: {dog.link}'''
     requests.get(send_text)
 
 
+def bot_send_all_photo(dog_id):
+
+    dog = DB_SESSION.query(Doggos).get(dog_id)
+    message = f'''Es gibt einen neuen Hund im Tierheim. Sein Name ist *{dog.name}* und er ist ein *{dog.breed}*. \n
+Schau ihn dir hier an: {dog.link}'''
+
+    photo_url = re.sub('-150x150','',dog.featured_image_link)
+    send_text = f'''https://api.telegram.org/bot{BOT_TOKEN}/SendPhoto?chat_id=@doggo_notifier&photo={photo_url}&parse_mode=Markdown&caption={message}'''
+    requests.get(send_text)
+
 def bot_sendphoto(dog):
 
     message = f'''Es gibt einen neuen Hund im Tierheim. Sein Name ist *{dog.name}* und er ist ein *{dog.breed}*. \n
 Schau ihn dir hier an: {dog.link}'''
-    
+
     photo_url = re.sub('-150x150','',dog.featured_image_link)
     send_text = f'''https://api.telegram.org/bot{BOT_TOKEN}/SendPhoto?chat_id={BOT_CHAT_ID}&photo={photo_url}&parse_mode=Markdown&caption={message}'''
     requests.get(send_text)
 
 def check_doggo(dog_id):
     '''handling the age and size check giving the dog id and sending the message'''
-    
+
     dog = DB_SESSION.query(Doggos).get(dog_id)
 
     try:

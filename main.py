@@ -9,7 +9,7 @@ import requests
 from connection import DB_SESSION
 
 from models import Doggos
-from check_dog import check_doggo
+from check_dog import check_doggo, bot_send_all_photo
 
 
 
@@ -26,7 +26,7 @@ def get_page_count(PAYLOAD):
     R = requests.head(URL, params=PAYLOAD)
     PAGE_COUNT = range(1, int(R.headers['X-WP-TotalPages'])+1)
     return PAGE_COUNT
-    
+
 def get_page_content(PAYLOAD):
     R = requests.get(URL, params=PAYLOAD)
     jdata = json.loads(R.text)
@@ -35,7 +35,7 @@ def get_page_content(PAYLOAD):
 PAGE_COUNT = get_page_count(PAYLOAD)
 
 if __name__ == '__main__':
-    
+
     for page in PAGE_COUNT:
         PAYLOAD2 = {
             'per_page':100,
@@ -45,7 +45,7 @@ if __name__ == '__main__':
             }
 
         jdata = get_page_content(PAYLOAD2)
-    
+
         for dog in jdata:
 
             record = Doggos(
@@ -64,15 +64,14 @@ if __name__ == '__main__':
                 first_seen_listed=datetime.datetime.now().strftime("%d.%m.%Y"),
                 last_seen_listed=datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
             )
-        
+
             EXISTS = DB_SESSION.query(Doggos).filter_by(id=dog['id']).first()
-        
+
             if not EXISTS:
                 DB_SESSION.add(record)
                 DB_SESSION.commit()
-                #check_doggo(dog['id'])
+                bot_send_all_photo(dog['id'])
+                check_doggo(dog['id'])
             else:
                 EXISTS.last_seen_listed = datetime.datetime.now().strftime('%d.%m.%Y %H:%M')
                 DB_SESSION.commit()
-            
-    
