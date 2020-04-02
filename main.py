@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """establishes database connection, loades json data from animal shelter
  and writes data against database"""
 import json
